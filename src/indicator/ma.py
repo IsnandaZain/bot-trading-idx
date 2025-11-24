@@ -23,4 +23,4 @@ def calculate_ma_va(df: pd.DataFrame, current_price: int):
     # print(f"MA20: {ma20}, MA50: {ma50}, MA200: {ma200}")
     # print(f"VA20: {vol_ma20}, VA50: {vol_ma50}, VA200: {vol_ma200}")
 
-    return [round(ma20), round(ma50), round(ma200)], [vol_ma20, vol_ma50, vol_ma200]
+    return round(ma20), round(ma50), round(ma200), vol_ma20, vol_ma50, vol_ma200
