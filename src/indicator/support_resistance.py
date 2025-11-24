@@ -55,18 +55,16 @@ def get_price_volatility(df: pd.DataFrame) -> float:
 def detect_support_resistance_robust(
     tickers: str,
     df: pd.DataFrame,
+    current_price: float,
     days: int = 200, 
     min_volume_multiplier: float = 1.0
 ) -> Tuple[Optional[float], Optional[float]]:
     """Deteksi level support dan resistance menggunakan metode robust"""
     
     # Hitung rata-rata volume untuk filter
-    print(df.head())
     avg_volume = df['volume'].mean()
     window = 2
     supports, resistances = [], []
-
-    print(avg_volume)
 
     for i in range(window, len(df) - window):
         vol_ok = df['volume'].iloc[i] >= avg_volume * min_volume_multiplier
@@ -81,8 +79,16 @@ def detect_support_resistance_robust(
     current_price = df['close'].iloc[-1]
     threshold_pct = max(0.005, volatility / current_price)
 
-    supports = merge_levels(supports, threshold_pct=threshold_pct)
-    resistances = merge_levels(resistances, threshold_pct=threshold_pct)
+    # gabung level berdekatan
+    all_levels = merge_levels(supports + resistances, threshold_pct=threshold_pct)
+
+    # Pisahkan berdasarkan harga saat ini
+    supports = [round(level) for level in all_levels if level < current_price]
+    resistances = [round(level) for level in all_levels if level > current_price]
+
+    # Urutkan: supports dari tinggi ke rendah, resistances dari rendah ke tinggi
+    supports = sorted(supports, reverse=True)
+    resistances = sorted(resistances)
 
     return supports, resistances
 
