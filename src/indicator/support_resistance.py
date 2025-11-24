@@ -53,10 +53,8 @@ def get_price_volatility(df: pd.DataFrame) -> float:
 
 
 def detect_support_resistance_robust(
-    tickers: str,
     df: pd.DataFrame,
     current_price: float,
-    days: int = 200, 
     min_volume_multiplier: float = 1.0
 ) -> Tuple[Optional[float], Optional[float]]:
     """Deteksi level support dan resistance menggunakan metode robust"""
