@@ -3,8 +3,8 @@ import datetime
 import pandas as pd
 
 from src.indicator import support_resistance as sr
-from src.indicator import ma
-from src.indicator import rsi
+from src.indicator import ma, rsi, helper
+
 
 
 
@@ -13,8 +13,11 @@ def build(df: pd.DataFrame, ticker: str):
         "ticker": ticker,
         "price": df['close'].iloc[-1],
         "volume": df['volume'].iloc[-1],
+        "volume_spike": False,
 
         # Support & Resistance
+        # supports : 500, 400, 300
+        # resistances : 300, 400, 500
         "major_supports": [],
         "major_resistances": [],
         "minor_supports": [],
@@ -81,5 +84,21 @@ def build(df: pd.DataFrame, ticker: str):
         current_price=df['close'].iloc[-1]
     )
 
-    print(detail)
+    detail["volume_spike"] = helper.is_volume_spike(
+        volume_today=detail["volume"],
+        volume_ma20=detail["vol_ma20"]
+    )
+
+    # validasi candle
+    prev_close = df['close'].iloc[-2]
+    prev_low = df['low'].iloc[-2]
+    current_open = df['open'].iloc[-1]
+    current_close = df['close'].iloc[-1]
+    current_low = df['low'].iloc[-1]
+
+    # Hammer: lower shadow panjang
+    is_hammer = (current_close > current_open) and \
+                (current_low < min(prev_close, current_open) - (current_close - current_open) * 2)
+    detail['is_bullish_candle'] = is_hammer or (current_close > prev_close)
+
     return detail
