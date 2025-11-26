@@ -6,6 +6,11 @@ from src.indicator import support_resistance as sr
 from src.indicator import ma, rsi, helper
 
 
+def is_uptrend(ma20: float, ma50: float, ma200: float) -> bool:
+    return ma20 > ma50 >= ma200
+
+def is_downtrend(ma20: float, ma50: float, ma200: float) -> bool:
+    return ma20 < ma50 <= ma200
 
 
 def build(df: pd.DataFrame, ticker: str):
@@ -63,10 +68,10 @@ def build(df: pd.DataFrame, ticker: str):
     # get nearest support & resistance
     nearest_supports = []
     if detail["major_supports"]:
-        nearest_supports.append(detail["major_supports"][-1])
+        nearest_supports.append(detail["major_supports"][0])
 
     if detail["minor_supports"]:
-        nearest_supports.append(detail["minor_supports"][-1])
+        nearest_supports.append(detail["minor_supports"][0])
 
     nearest_resistances = []
     if detail["major_resistances"]:
@@ -82,6 +87,19 @@ def build(df: pd.DataFrame, ticker: str):
     detail["ma20"], detail["ma50"], detail["ma200"], detail["vol_ma20"], detail["vol_ma50"], detail["vol_ma200"] = ma.calculate_ma_va(
         df=df,
         current_price=df['close'].iloc[-1]
+    )
+
+    # update is_uptrend - is_downtrend
+    detail["is_uptrend"] = is_uptrend(
+        ma20=detail["ma20"],
+        ma50=detail["ma50"],
+        ma200=detail["ma200"]
+    )
+
+    detail["is_downtrend"] = is_downtrend(
+        ma20=detail["ma20"],
+        ma50=detail["ma50"],
+        ma200=detail["ma200"]
     )
 
     detail["volume_spike"] = helper.is_volume_spike(
@@ -101,4 +119,5 @@ def build(df: pd.DataFrame, ticker: str):
                 (current_low < min(prev_close, current_open) - (current_close - current_open) * 2)
     detail['is_bullish_candle'] = is_hammer or (current_close > prev_close)
 
+    print(detail)
     return detail

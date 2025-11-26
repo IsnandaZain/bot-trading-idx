@@ -27,7 +27,7 @@ def buy_signal_confluence(state: dict) -> bool:
     confluence = abs(support - ma50) / ma50 <= 0.05
 
     # Tren menengah bullish
-    trend_ok = state["ma50"] > state["ma200"]
+    trend_ok = state["ma50"] >= state["ma200"]
 
     # Volume spike + RSI / Stoch oversold
     # rsi_ok = state["rsi"] is not None and state["rsi"] < 30
@@ -48,7 +48,7 @@ def buy_signal_triple_confirmation(state: dict) -> bool:
     return (
         state["is_uptrend"] and
         state['volume_spike'] and
-        state["near_support"] and
+        state["nearest_support"] and
         state["price"] > state["ma20"]
     )
 
@@ -60,14 +60,14 @@ def buy_signal_pullback_strong_trend(state: dict) -> bool:
     # Pullback ke MA20
     near_ma20 = (
         state["price"] >= state["ma20"] and           # harga di atas MA20
-        state["price"] <= state["ma20"] * 1.03        # tapi tidak lebih dari 3% di atas
+        state["price"] <= state["ma20"] * 1.05        # tapi tidak lebih dari 3% di atas
     )
 
     # Belum dekat resistance
     not_near_resistance = state["price"] <= state["major_resistances"][0] * 0.95
 
     # Volume tidak anjlok
-    volume_ok = state["volume"] >= state["vol_ma20"] * 0.8
+    volume_ok = state["volume"] >= state["vol_ma20"] * 0.5
 
     return strong_trend and near_ma20 and not_near_resistance and volume_ok
 
