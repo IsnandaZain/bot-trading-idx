@@ -17,8 +17,8 @@ def calculate_stop_loss(state: dict, signal_name: str) -> float:
         
     # Breakout
     elif signal_name == "Breakout":
-        if state["resistances"]:
-            breakout_level = state["resistances"][0]
+        if state["major_resistances"]:
+            breakout_level = state["major_resistances"][0]
             return breakout_level * 0.98
         
         else:
@@ -54,8 +54,8 @@ def calculate_take_profit(state: dict, sl_price: float, signal_name: str):
     
     # Breakout
     if signal_name == "Breakout":
-        if len(state["resistance"]) > 1:
-            next_resistance = state["resistances"][1]
+        if len(state["major_resistances"]) > 1:
+            next_resistance = state["major_resistances"][1]
             if next_resistance > price:
                 return next_resistance
             
@@ -64,8 +64,8 @@ def calculate_take_profit(state: dict, sl_price: float, signal_name: str):
     
     # Confluence Zone atau Triple Confirmation
     elif signal_name in ["Confluence Zone", "Triple Confirmation"]:
-        if state["resistances"]:
-            resistance = state["resistance"][0]
+        if state["major_resistances"]:
+            resistance = state["major_resistances"][0]
             if resistance > price:
                 return resistance
             
@@ -74,8 +74,8 @@ def calculate_take_profit(state: dict, sl_price: float, signal_name: str):
     
     # Pullback Strong Trend
     elif signal_name == "Pullback Strong Trend":
-        if state["resistances"]:
-            resistance = state["resistances"][0]
+        if state["major_resistances"]:
+            resistance = state["major_resistances"][0]
             if resistance > price:
                 min_tp = price + (risk * 2)
                 return max(resistance, min_tp)
@@ -85,8 +85,8 @@ def calculate_take_profit(state: dict, sl_price: float, signal_name: str):
     
     # Default
     else:
-        if state["resistances"]:
-            resistance = state["resistances"][0]
+        if state["major_resistances"]:
+            resistance = state["major_resistances"][0]
             if resistance > price:
                 return resistance
             
