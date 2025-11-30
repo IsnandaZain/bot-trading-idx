@@ -10,7 +10,7 @@ def log_trade_decision(state: Dict, trade_plan: Dict):
         timestamp=datetime.now(),
         ticker=state["ticker"],
         signal_type=trade_plan.get("signal_name", ""),
-        action=trade_plan.get("action", ""),
+        action=trade_plan.get("action", "BUY"),
         entry_price=int(trade_plan.get("entry_price", 0)),
         sl_price=int(trade_plan.get("sl_price", 0)),
         tp_price=int(trade_plan.get("tp_price", 0)),

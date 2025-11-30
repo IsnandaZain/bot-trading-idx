@@ -82,6 +82,8 @@ class DataHistories(Base):
 class TradeLog(Base):
     __tablename__ = 'trade_log'
 
+    ACTION_BUY = 'BUY'
+
     id = Column(Integer, primary_key=True, autoincrement=True)
 
     timestamp = Column(DateTime, default=None)
@@ -107,6 +109,12 @@ class TradeLog(Base):
     valid = Column(Boolean, nullable=False, default=True)
 
     reason = Column(String(255), nullable=False, default='')
+
+    highest_since_entry = Column(Integer, nullable=True)
+
+    trailing_stop_level = Column(Integer, nullable=True)
+
+    status = Column(String(30), default="RUNNING")
 
     # Snapshot Kondisi Pasar
     price = Column(Integer, nullable=False, default=0)
@@ -138,4 +146,3 @@ class TradeLog(Base):
 
     exit_timestamp = Column(DateTime, default=None)
 
-    
