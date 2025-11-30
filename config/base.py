@@ -4,7 +4,7 @@ from datetime import date
 import pymysql
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, Date, ForeignKey, Boolean
 from sqlalchemy.orm import sessionmaker, relationship, backref
 from sqlalchemy.dialects.mysql import DOUBLE, LONGTEXT
 
@@ -77,3 +77,65 @@ class DataHistories(Base):
         self.close = close
         self.volume = volume
         self.date = date
+
+
+class TradeLog(Base):
+    __tablename__ = 'trade_log'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    timestamp = Column(DateTime, default=None)
+
+    ticker = Column(String(5), nullable=False, default='')
+
+    signal_type = Column(String(45), nullable=False, default='')
+
+    action = Column(String(10), nullable=False, default='')  # buy or sell
+
+    entry_price = Column(Integer, nullable=False, default=0)
+
+    sl_price = Column(Integer, nullable=False, default=0)
+
+    tp_price = Column(Integer, nullable=False, default=0)
+
+    lot_size = Column(Integer, nullable=False, default=0)
+
+    risk_rupiah = Column(Integer, nullable=False, default=0)
+
+    rr_ratio = Column(DOUBLE, nullable=False, default=0.0)
+
+    valid = Column(Boolean, nullable=False, default=True)
+
+    reason = Column(String(255), nullable=False, default='')
+
+    # Snapshot Kondisi Pasar
+    price = Column(Integer, nullable=False, default=0)
+
+    ma20 = Column(Integer, default=0)
+
+    ma50 = Column(Integer, default=0)
+
+    ma200 = Column(Integer, default=0)
+
+    volume = Column(Integer, default=0)
+
+    volume_ma20 = Column(Integer, default=0)
+
+    supports = Column(LONGTEXT, nullable=False, default='')  # Simpan sebagai JSON string
+
+    resistances = Column(LONGTEXT, nullable=False, default='')  # Simpan sebagai JSON string
+
+    rsi = Column(DOUBLE, nullable=False, default=0.0)
+
+    stoch_k = Column(DOUBLE, nullable=False, default=0.0)
+
+    stoch_d = Column(DOUBLE, nullable=False, default=0.0)
+
+    # Evaluasi Sinyal
+    outcome = Column(String(20), nullable=False, default='pending')  # win, loss, pending
+
+    exit_price = Column(Integer, nullable=False, default=0)
+
+    exit_timestamp = Column(DateTime, default=None)
+
+    
