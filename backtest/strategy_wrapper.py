@@ -5,6 +5,7 @@ from src.strategy import risk_management as rm
 from src.strategy import build_trading_state as bts
 
 from src.indicator import support_resistance as sr
+from src.indicator import helper
 
 
 def simulate_build_trading_state(df: pd.DataFrame, ticker: str):
@@ -25,6 +26,7 @@ def simulate_build_trading_state(df: pd.DataFrame, ticker: str):
     )
 
     print(f"Supports: {supports}, Resistances: {resistances}")
+    print(f"MA20: {ma20}, MA50: {ma50}, MA200: {ma200}, VolMA20: {vol_ma20}")
 
     state = {
         "ticker": ticker,
@@ -56,6 +58,12 @@ def simulate_build_trading_state(df: pd.DataFrame, ticker: str):
         "date": df.index[-1],
         "has_enough_data": len(df) >= 200,
     }
+
+    # validasi volume spike
+    state["volume_spike"] = helper.is_volume_spike(
+        volume_today=state["volume"],
+        volume_ma20=state["vol_ma20"]
+    )
 
     # validasi candle
     prev_close = df['close'].iloc[-2]

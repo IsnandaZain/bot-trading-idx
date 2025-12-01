@@ -57,6 +57,9 @@ def buy_signal_pullback_strong_trend(state: dict) -> bool:
     # Tren sangat kuat
     strong_trend = state["is_uptrend"]
 
+    if not state["major_resistances"]: # jika tidak ada resistance maka auto tidak valid
+        return False
+
     # Pullback ke MA20
     near_ma20 = (
         state["price"] >= state["ma20"] and           # harga di atas MA20
@@ -76,6 +79,9 @@ def buy_signal_support_reversal(state: dict) -> bool:
     # Asumsi: candle bullish sudah diverifikasi diluar (misal: via OHLC)
     # Disini kita fokus pada support
     if not state["is_bullish_candle"]:
+        return False
+    
+    if not state["nearest_support"]:
         return False
     
     near_support = (
@@ -114,6 +120,28 @@ BUY_SIGNAL_PRIORITIES = [
     ("Breakout", buy_signal_breakout),
 ]
 
+# SIGNAL HIGH RISK
+def buy_signal_false_breakdown_reversal(state: dict) -> bool:
+    """Opsi 6: False Breakdown Reversal"""
+    # Asumsi: candle bullish sudah diverifikasi diluar (misal: via OHLC)
+    # Disini kita fokus pada support
+    if not (state["ma200"] >= state["ma50"] > state["ma20"]):
+        return False
+    
+    if state["price"] <= state["ma20"]:
+        return False
+    
+    # volume rebound kuat
+    if not state["volume_spike"]:
+        return False
+    
+    return True
+
+
+BUY_SIGNAL_HIGH_RISK = [
+    ("Breakdown Reversal", buy_signal_false_breakdown_reversal),
+]
+
 def evaluate_buy_signals(state: dict) -> Tuple[bool, str, Optional[str]]:
     """
     Evaluasi semua sinyal buy dengan prioritas
@@ -124,5 +152,9 @@ def evaluate_buy_signals(state: dict) -> Tuple[bool, str, Optional[str]]:
     for signal_name, signal_func in BUY_SIGNAL_PRIORITIES:
         if signal_func(state):
             return True, signal_name, f"Buy signal: {signal_name} detected."
+        
+    for signal_name, signal_func in BUY_SIGNAL_HIGH_RISK:
+        if signal_func(state):
+            return True, signal_name, f"High Risk Buy signal: {signal_name} detected."
         
     return False, "", "Tidak ada sinyal buy yang valid"

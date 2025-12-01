@@ -38,6 +38,11 @@ def calculate_stop_loss(state: dict, signal_name: str) -> float:
         else:
             return price * 0.97
         
+    # Untuk HIGH RISK
+    # Breakdown Reversal
+    elif signal_name == "Breakdown Reversal":
+        return state["ma20"] * 0.99
+        
     else:
         if state["nearest_support"]:
             return state["nearest_support"] * 0.98
