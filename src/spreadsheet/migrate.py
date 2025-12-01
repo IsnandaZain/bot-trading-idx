@@ -92,6 +92,14 @@ def generate_data_histories(filename: str = "dataset.xlsx"):
     df.columns = new_columns
 
     for index, row in df.iloc[1:].iterrows():
+        # get existing data
+        exist_data = bs.session.query(bs.DataHistories).filter(
+            bs.DataHistories.ticker == ticker,
+            bs.DataHistories.date == row["Date"].strftime("%Y-%m-%d")
+        ).first()
+
+        if exist_data:
+            continue
 
         # save data to database
         data = bs.DataHistories(
