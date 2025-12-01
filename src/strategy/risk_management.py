@@ -92,4 +92,24 @@ def calculate_take_profit(state: dict, sl_price: float, signal_name: str):
             
         return price + (risk * 2)
     
+
+def calculate_lot_size(entry_price: int, sl_price: int, risk_rupiah: int = 100000):
+    """
+    Hitung lot size berdasarkan fixed risk Rp. 100.000
+    Returns:
+        (lot_size: int, actual_risk: float)
+    """
+    if sl_price >= entry_price:
+        return 0, 0.0
+    
+    risk_per_share = entry_price - sl_price
+    if risk_per_share <= 0:
+        return 0, 0.0
+    
+    # 1 lot = 100 saham
+    lot_size = risk_rupiah / (risk_per_share * 100)
+    lot_size = math.floor(lot_size)
+
+    actual_risk = lot_size * risk_per_share * 100
+    return max(0, int(lot_size)), actual_risk
     
