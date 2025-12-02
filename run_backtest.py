@@ -4,6 +4,7 @@ import sqlalchemy
 from config import configuration as cfg
 
 from backtest import backtest_engine as be
+from backtest import performance_analyzer as pa
 
 # Konfigurasi
 TICKERS = ["TOBA"]
@@ -43,6 +44,7 @@ def main():
         print(f"✅ Backtest selesai untuk {ticker}, total trades: {len(trades)}")
 
     # generate laporan akhir
+    pa.generate_performance_report(all_trades[0])
 
 
 

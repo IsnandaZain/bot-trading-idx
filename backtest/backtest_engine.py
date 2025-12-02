@@ -116,3 +116,5 @@ def run_backtest_for_ticker(df, ticker, initial_capital=20000000):
             "risk": actual_risk
         })
 
+    return trades
+
