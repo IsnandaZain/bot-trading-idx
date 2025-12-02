@@ -96,7 +96,7 @@ def buy_signal_support_reversal(state: dict) -> bool:
 
 def buy_signal_breakout(state: dict) -> bool:
     """Opsi 5: Breakout"""
-    if not state["major_resistances"] and not [state["minor_resistances"]]:
+    if not state["major_resistances"] and not state["minor_resistances"]:
         return False
     
     # Harga sudah tembus resistance terdekat

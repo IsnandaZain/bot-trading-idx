@@ -80,7 +80,7 @@ def build(df: pd.DataFrame, ticker: str):
     if detail["minor_resistances"]:
         nearest_resistances.append(detail["minor_resistances"][0])
 
-    detail["nearest_support"] = min(nearest_supports) 
+    detail["nearest_support"] = max(nearest_supports) 
     detail["nearest_resistance"] = min(nearest_resistances) 
 
     # generate moving average dan volume average
