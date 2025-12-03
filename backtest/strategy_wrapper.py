@@ -5,6 +5,7 @@ from src.strategy import risk_management as rm
 from src.strategy import build_trading_state as bts
 
 from src.indicator import support_resistance as sr
+from src.indicator import ma as ma_indicator
 from src.indicator import helper
 
 
@@ -28,6 +29,9 @@ def simulate_build_trading_state(df: pd.DataFrame, ticker: str):
     state = {
         "ticker": ticker,
         "price": current_price,
+        "price_prev": df['close'].iloc[-2] if len(df) >=2 else df['close'].iloc[-1],
+        "high": df['high'].iloc[-1],
+        "low": df['low'].iloc[-1],
         "volume": df["volume"].iloc[-1],
         "volume_spike": False,
 
@@ -45,6 +49,7 @@ def simulate_build_trading_state(df: pd.DataFrame, ticker: str):
         "ma200": ma200,
         "is_uptrend": bts.is_uptrend(ma20, ma50, ma200),
         "is_downtrend": bts.is_downtrend(ma20, ma50, ma200),
+        "is_ma200_uptrend": False,
         
         # Volume Average
         "vol_ma20": vol_ma20,
@@ -68,6 +73,15 @@ def simulate_build_trading_state(df: pd.DataFrame, ticker: str):
     current_open = df['open'].iloc[-1]
     current_close = df['close'].iloc[-1]
     current_low = df['low'].iloc[-1]
+
+    # Update is_ma200_uptrend
+    state["is_ma200_uptrend"] = ma_indicator.is_ma200_uptrend(
+        df=df,
+        ma_col="ma200",
+        lookback_ma=200,
+        lookback_days=30,
+        min_slope_pct=0.05
+    )
 
     # Hammer: lower shadow panjang
     is_hammer = (current_close > current_open) and \

@@ -122,7 +122,7 @@ def find_valid_sl_level(state: dict, max_depth_pct: float = 0.05) -> int:
     Kandidat: support, MA20, MA50, MA200
     """
     price = state["price"]
-    min_level = price * (1 - max_depth_pct)
+    min_level = int(price * (1 - max_depth_pct))
     candidates = []
 
     print(f"Finding SL level below {price} down to {min_level}")

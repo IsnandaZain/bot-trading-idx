@@ -17,6 +17,9 @@ def build(df: pd.DataFrame, ticker: str):
     detail = {
         "ticker": ticker,
         "price": df['close'].iloc[-1],
+        "price_prev": df['close'].iloc[-2] if len(df) >=2 else df['close'].iloc[-1],
+        "high": df['high'].iloc[-1],
+        "low": df['low'].iloc[-1],
         "volume": df['volume'].iloc[-1],
         "volume_spike": False,
 
@@ -36,6 +39,7 @@ def build(df: pd.DataFrame, ticker: str):
         "ma200": 0,
         "is_uptrend": False,
         "is_downtrend": False,
+        "is_ma200_uptrend": False,
         
         # Volume Average
         "vol_ma20": 0,
@@ -102,6 +106,15 @@ def build(df: pd.DataFrame, ticker: str):
         ma200=detail["ma200"]
     )
 
+    # Update is_ma200_uptrend
+    detail["is_ma200_uptrend"] = ma.is_ma200_uptrend(
+        df=df,
+        ma_col="ma200",
+        lookback_ma=200,
+        lookback_days=30,
+        min_slope_pct=0.05
+    )
+    
     detail["volume_spike"] = helper.is_volume_spike(
         volume_today=detail["volume"],
         volume_ma20=detail["vol_ma20"]

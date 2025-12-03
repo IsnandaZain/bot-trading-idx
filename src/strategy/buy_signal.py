@@ -43,7 +43,30 @@ def buy_signal_confluence(state: dict) -> bool:
         state['volume_spike']
     )
 
-def buy_signal_triple_confirmation(state: dict) -> bool:
+def buy_signal_ma200_bounce(state: dict) -> bool:
+    # Opsional
+    # TICKERS_MA200_BOUNCE = []
+    # if state["ticker"] not in TICKERS_MA200_BOUNCE:
+    #     return False
+    
+    # MA200 harus naik
+    if not state["is_ma200_uptrend"]:
+        return False
+    
+    # harga dekat MA200
+    if abs(state["price"] - state["ma200"]) / state["ma200"] > 0.06 or abs(state["low"] - state["ma200"]) / state["ma200"] > 0.06:
+        return False
+    
+    if state["price"] < state["ma200"]:
+        return False
+    
+    if not state["volume_spike"]:
+        return False
+    
+    return True
+
+
+def buy_signal_triple_confirmation_old(state: dict) -> bool:
     """Opsi 2: Triple Confirmation"""
     return (
         state["is_uptrend"] and
@@ -51,6 +74,43 @@ def buy_signal_triple_confirmation(state: dict) -> bool:
         state["nearest_support"] and
         state["price"] > state["ma20"]
     )
+
+
+def buy_signal_triple_confirmation(state: dict) -> bool:
+    """
+    Enhanced Triple Confirmation :
+    - Tren kuat (MA20 > MA50 > MA200)
+    - Pullback sehat (harga dekat support, tapi tidak jauh dari MA20)
+    - Volume konfirmasi
+    - Momentum masih bullish (harga belum turun tajam)
+    """
+    if not state["is_uptrend"]:
+        return False
+    
+    if not state["nearest_support"]:
+        return False
+    
+    price = state["price"]
+    ma20 = state["ma20"]
+    
+    if price <= ma20:
+        return False
+    
+    if price > ma20 * 1.05:
+        return False
+    
+    if (price - state["nearest_support"]) / price > 0.05:
+        return False
+    
+    if not state["volume_spike"]:
+        return False
+    
+    # Opsional
+    if price < state["price_prev"]:
+        return False
+    
+    return True
+
 
 def buy_signal_pullback_strong_trend(state: dict) -> bool:
     """Opsi 3: Pullback dalam Tren Kuat"""
@@ -84,6 +144,10 @@ def buy_signal_support_reversal(state: dict) -> bool:
     if not state["nearest_support"]:
         return False
     
+    # pastikan bahwa harga tidak berada diatas semua MA
+    if state["price"] > max(state["ma20"], state["ma50"], state["ma200"]):
+        return False
+    
     near_support = (
         state["price"] >= state["nearest_support"] and
         state["price"] <= state["nearest_support"] * 1.05
@@ -114,6 +178,7 @@ def buy_signal_breakout(state: dict) -> bool:
 # Prioritas
 BUY_SIGNAL_PRIORITIES = [
     ("Confluence Zone", buy_signal_confluence),
+    ("MA200 Bounce", buy_signal_ma200_bounce),
     ("Tiple Confirmation", buy_signal_triple_confirmation),
     ("Pullback Strong Trend", buy_signal_pullback_strong_trend),
     ("Support Reversal", buy_signal_support_reversal),

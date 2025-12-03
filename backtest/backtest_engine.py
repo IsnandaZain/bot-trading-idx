@@ -106,11 +106,13 @@ def run_backtest_for_ticker(df, ticker, initial_capital=20000000):
         trades.append({
             "ticker": ticker,
             "entry_date": today,
-            "entry_price": entry_price,
-            "signal": signal_name,
             "exit_date": exit_date,
+            "entry_price": entry_price,
             "exit_price": exit_price,
+            "sl_price": sl_price,
+            "signal": signal_name,
             "lot_size": lot_size,
+            "porto_value": entry_price * lot_size * 100,
             "outcome": outcome,
             "pnl": pnl,
             "risk": actual_risk
