@@ -84,8 +84,8 @@ def build(df: pd.DataFrame, ticker: str):
     if detail["minor_resistances"]:
         nearest_resistances.append(detail["minor_resistances"][0])
 
-    detail["nearest_support"] = max(nearest_supports) 
-    detail["nearest_resistance"] = min(nearest_resistances) 
+    detail["nearest_support"] = max(nearest_supports) if nearest_supports else None
+    detail["nearest_resistance"] = min(nearest_resistances) if nearest_resistances else None
 
     # generate moving average dan volume average
     detail["ma20"], detail["ma50"], detail["ma200"], detail["vol_ma20"], detail["vol_ma50"], detail["vol_ma200"] = ma.calculate_ma_va(
@@ -132,5 +132,10 @@ def build(df: pd.DataFrame, ticker: str):
                 (current_low < min(prev_close, current_open) - (current_close - current_open) * 2)
     detail['is_bullish_candle'] = is_hammer or (current_close > prev_close)
 
-    print(detail)
+    # Kebutuhan analisa manual
+    print(f"ticker: {ticker} - price: {detail['price']}")
+    print(f"major_supports: {detail['major_supports']} - major_resistances: {detail['major_resistances']}")
+    print(f"minor_supports: {detail['minor_supports']} - minor_resistances: {detail['minor_resistances']}")
+    print(f"ma20: {detail['ma20']} - ma50: {detail['ma50']} - ma200: {detail['ma200']}")
+    print(f"is_uptrend: {detail['is_uptrend']} - is_downtrend: {detail['is_downtrend']} - is_ma200_uptrend: {detail['is_ma200_uptrend']}")
     return detail

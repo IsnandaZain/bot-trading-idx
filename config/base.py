@@ -110,12 +110,6 @@ class TradeLog(Base):
 
     reason = Column(String(255), nullable=False, default='')
 
-    highest_since_entry = Column(Integer, nullable=True)
-
-    trailing_stop_level = Column(Integer, nullable=True)
-
-    status = Column(String(30), default="RUNNING")
-
     # Snapshot Kondisi Pasar
     price = Column(Integer, nullable=False, default=0)
 
@@ -140,6 +134,8 @@ class TradeLog(Base):
     stoch_d = Column(DOUBLE, nullable=False, default=0.0)
 
     # Evaluasi Sinyal
+    highest_since_entry = Column(Integer, nullable=True)
+
     outcome = Column(String(20), nullable=False, default='pending')  # win, loss, pending
 
     exit_price = Column(Integer, nullable=False, default=0)

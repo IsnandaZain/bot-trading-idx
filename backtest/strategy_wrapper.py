@@ -88,9 +88,9 @@ def simulate_build_trading_state(df: pd.DataFrame, ticker: str):
                 (current_low < min(prev_close, current_open) - (current_close - current_open) * 2)
     state['is_bullish_candle'] = is_hammer or (current_close > prev_close)
 
-    print(f"Supports: {supports}, Resistances: {resistances} - nearest_support: {state['nearest_support']}, nearest_resistance: {state['nearest_resistance']}")
-    print(f"MA20: {ma20}, MA50: {ma50}, MA200: {ma200}, VolMA20: {vol_ma20}")
-    print(f"is_bullish_candle: {state['is_bullish_candle']}, volume_spike: {state['volume_spike']}")
+    # print(f"Supports: {supports}, Resistances: {resistances} - nearest_support: {state['nearest_support']}, nearest_resistance: {state['nearest_resistance']}")
+    # print(f"MA20: {ma20}, MA50: {ma50}, MA200: {ma200}, VolMA20: {vol_ma20}")
+    # print(f"is_bullish_candle: {state['is_bullish_candle']}, volume_spike: {state['volume_spike']}")
 
     return state
 

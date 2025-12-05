@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from src.strategy import buy_signal as bs
 from src.strategy import risk_management as rm
+from src.strategy import profit_management as pm
 
 from backtest import strategy_wrapper as sw
 
@@ -66,27 +67,50 @@ def run_backtest_for_ticker(df, ticker, initial_capital=20000000):
               dengan lot size {lot_size}, SL: {sl_price}, TP: {tp_price} \n \
               entry_price: {entry_price}")
 
-        # Cari di hari 10 hari bursa (2minggu) kedepan (maksimal hold 10 hari untuk swing)
-        for j in range(i+1, min(i+11, len(df))):
+        # Enhance masa tunggu exit: maksimal 10hari dari penentuan TP
+        j = i+1
+        max_hold_days = 10
+        days_held = 0
+
+        while j < len(df) and days_held <= max_hold_days:
             # update indeks agar tidak double count hari yang sama
             i = j
 
             future_price = df['close'].iloc[j]
             future_high = df['high'].iloc[j]
             future_low = df['low'].iloc[j]
+            # print(f"  Memeriksa harga di tanggal {df.index[j].date()} : close {future_price}, high {future_high}, low {future_low}")
 
             # Cek SL/TP diharga high/low (lebih realistis)
             if future_low <= sl_price:
                 exit_price = sl_price
                 exit_date = df.index[j]
                 outcome = "SL"
+
+                i = j
                 break
             
             elif tp_price and future_high >= tp_price:
-                exit_price = tp_price
-                exit_date = df.index[j]
-                outcome = "TP"
-                break
+
+                # penerapan extend TP
+                # generate state untuk kebutuhan extended TP dan trailing stop
+                state = sw.simulate_build_trading_state(df.iloc[:j+1], ticker)
+                print(f"state untuk extended TP {state['date']}: {state['price']}, {state['ma20']}, {state['vol_ma20']}, {state['is_uptrend']}")
+                if pm.should_extended_tp(state, tp_price):
+                    tp_price = pm.calculate_extended_tp(state, entry_price, sl_price)
+                    sl_price = pm.calculate_trailing_stop(state, entry_price, sl_price)
+                    print(f"Memperpanjang TP untuk {ticker} pada tanggal {df.index[j].date()} menjadi {tp_price} dan trailing_stop menjadi {sl_price}")
+                    
+                    max_hold_days = days_held + 10
+
+                else:
+                    exit_price = tp_price
+                    exit_date = df.index[j]
+                    outcome = "TP"
+                    break
+
+            j += 1
+            days_held += 1
 
         # Jika tidak exit dalam 10 hari, exit di close hari ke 10
         if not exit_price:

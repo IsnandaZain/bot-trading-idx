@@ -7,13 +7,7 @@ def calculate_stop_loss(state: dict, signal_name: str) -> float:
     
     # Confluence Zone
     if signal_name == "Confluence Zone":
-        if state["nearest_support"] and state["ma50"]:
-            confluence_level = min(state["nearest_support"], state["ma50"])
-            return confluence_level * 0.98
-        elif state["nearest_support"]:
-            return state["nearest_support"] * 0.98
-        else:
-            return price * 0.97
+        return find_valid_sl_level(state, max_depth_pct=0.06)
         
     # Breakout
     elif signal_name == "Breakout":
@@ -142,4 +136,4 @@ def find_valid_sl_level(state: dict, max_depth_pct: float = 0.05) -> int:
     if candidates:
         return min(candidates) * 0.99
     
-    return price * (1 - max_depth_pct)
+    return round(price * (1 - max_depth_pct), 0)
