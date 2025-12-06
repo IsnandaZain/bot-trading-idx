@@ -4,6 +4,8 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+from src.spreadsheet import normalize_price as np
+
 from config import base as bs
 
 def read(save: bool = False, date: str = None):
@@ -101,14 +103,24 @@ def generate_data_histories(filename: str = "dataset.xlsx"):
         if exist_data:
             continue
 
+        # pengkondisian saham suspend
+        if row['Open'] in ['#N/A', 0]:
+            row['Open'] = row['Close']
+
+        if row['High'] in ['#N/A', 0]:
+            row['High'] = row['Close']
+            
+        if row['Low'] in ['#N/A', 0]:
+            row['Low'] = row['Close']
+
         # save data to database
         data = bs.DataHistories(
             ticker=ticker,
-            open=row["Open"],
-            high=row["High"],
-            low=row["Low"],
-            close=row["Close"],
-            volume=row["Volume"],
+            open=np.normalize_price(row["Open"]),
+            high=np.normalize_price(row["High"]),
+            low=np.normalize_price(row["Low"]),
+            close=np.normalize_price(row["Close"]),
+            volume=np.normalize_price(row["Volume"]),
             date=row["Date"].strftime("%Y-%m-%d") if type(row["Date"]) != str else row["Date"]
         )
 
